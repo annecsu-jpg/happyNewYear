@@ -3,137 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>真正無限循環愛心 - 芸萱媽媽</title>
+    <title>永遠不間斷的愛 - 芸萱媽媽</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #fff0f5;
+            background-color: #fff0f5; /* 浪漫粉色背景 */
             overflow: hidden;
-            font-family: "Microsoft JhengHei", sans-serif;
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
         }
 
-        .container {
+        /* 讓容器佔滿全螢幕 */
+        .heart-container {
             width: 100vw;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+            z-index: 10;
         }
 
         svg {
-            width: 90%;
-            height: 90%;
+            width: 95%;
+            height: 95%;
             overflow: visible;
         }
 
-        /* 跑馬燈文字樣式 */
+        /* 跑馬燈文字顏色動畫 */
         .marquee-text {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 900;
             fill: #ff4757;
-            /* 彩虹漸變效果 */
-            animation: rainbow 5s linear infinite;
+            animation: rainbowColors 8s linear infinite;
         }
 
-        @keyframes rainbow {
+        @keyframes rainbowColors {
             0% { fill: #ff4757; }
-            33% { fill: #ffa502; }
-            66% { fill: #2ed573; }
+            25% { fill: #ff9f43; }
+            50% { fill: #2ed573; }
+            75% { fill: #1e90ff; }
             100% { fill: #ff4757; }
         }
 
-        /* 漂浮新年愛心 */
+        /* 背景漂浮小愛心 */
         .float-heart {
             position: absolute;
             pointer-events: none;
             z-index: 1;
         }
-        .emoji { font-size: 60px; opacity: 0.7; }
+        .emoji { font-size: 50px; opacity: 0.6; }
         .msg {
             position: absolute;
             color: white;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             top: 40%;
             left: 50%;
             transform: translateX(-50%);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             white-space: nowrap;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
 
-        @keyframes riseUp {
+        @keyframes floatUp {
             0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
             10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-20vh) scale(1.2) rotate(360deg); opacity: 0; }
+            100% { transform: translateY(-20vh) scale(1.3) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="heart-container">
         <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
             <defs>
-                <path id="heartPath" d="M400,550 C300,450 20,350 20,180 C20,50 300,50 400,180 C500,50 780,50 780,180 C780,350 500,450 400,550 Z" />
+                <path id="masterHeartPath" d="M400,550 C250,450 20,350 20,180 C20,50 300,50 400,180 C500,50 780,50 780,180 C780,350 550,450 400,550 Z" />
             </defs>
             <text class="marquee-text">
-                <textPath id="tp" xlink:href="#heartPath" startOffset="0"></textPath>
+                <textPath id="movingText" xlink:href="#masterHeartPath" startOffset="0"></textPath>
             </text>
         </svg>
     </div>
 
     <script>
-        const textStr = "❤️ 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽　";
-        const tp = document.getElementById('tp');
-        const path = document.getElementById('heartPath');
-        const pathLength = path.getTotalLength();
-
-        // 核心邏輯：將文字重複填充，直到長度超過路徑的兩倍，確保循環時不會看到斷頭
-        let longText = textStr;
-        while (tp.getComputedTextLength() < pathLength * 2) {
-            longText += textStr;
-            tp.textContent = longText;
-        }
-
-        // 使用 JS 動畫來控制 startOffset，達成毫秒級精準對接
-        let offset = 0;
-        const singleTextLength = tp.getComputedTextLength() / (longText.length / textStr.length);
-
-        function animate() {
-            offset -= 1.5; // 控制轉動速度，數字越大越快
-            // 當位移超過一串文字的長度時，瞬間重設為 0，因為內容是一樣的，視覺上完全無感
-            if (Math.abs(offset) >= singleTextLength) {
-                offset = 0;
+        const unitText = "❤️ 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽新年快樂　　";
+        const textPathElement = document.getElementById('movingText');
+        const pathElement = document.getElementById('masterHeartPath');
+        
+        // 1. 自動計算路徑長度，並填充足夠多的文字來覆蓋它
+        function setupMarquee() {
+            const pathLength = pathElement.getTotalLength();
+            let combinedText = unitText;
+            
+            // 填充文字直到長度超過路徑長度的兩倍，確保循環時不會有空白
+            textPathElement.textContent = combinedText;
+            while (textPathElement.getComputedTextLength() < pathLength + (pathLength / 2)) {
+                combinedText += unitText;
+                textPathElement.textContent = combinedText;
             }
-            tp.setAttribute('startOffset', offset);
-            requestAnimationFrame(animate);
+
+            // 取得單個文字單位的精確寬度
+            const singleUnitWidth = textPathElement.getComputedTextLength() / (combinedText.length / unitText.length);
+            
+            let currentOffset = 0;
+            const speed = 1.2; // 調整這個數字可以改變速度
+
+            function step() {
+                currentOffset -= speed;
+                
+                // 當移動距離超過一個單位的文字寬度時，瞬間歸零
+                // 因為後面的文字跟前面長得一模一樣，所以視覺上是無縫的！
+                if (Math.abs(currentOffset) >= singleUnitWidth) {
+                    currentOffset = 0;
+                }
+                
+                textPathElement.setAttribute('startOffset', currentOffset);
+                requestAnimationFrame(step);
+            }
+            
+            step();
         }
 
-        // 等待字體載入後開始動畫
-        window.onload = animate;
+        // 確保字體載入後再開始計算寬度
+        if (document.fonts) {
+            document.fonts.ready.then(setupMarquee);
+        } else {
+            window.onload = setupMarquee;
+        }
 
-        // 生成新年快樂愛心
-        function createHearts() {
+        // --- 以下是裝飾用的新年快樂愛心 ---
+        function createFloatingHeart() {
             const div = document.createElement('div');
             div.className = 'float-heart';
             div.style.left = Math.random() * 90 + 'vw';
             div.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
-            div.style.animation = `riseUp ${Math.random() * 3 + 5}s linear forwards`;
-
-            div.innerHTML = `
-                <div class="emoji">❤️</div>
-                <div class="msg">新年快樂</div>
-            `;
+            div.style.animation = `floatUp ${Math.random() * 3 + 5}s linear forwards`;
+            div.innerHTML = `<div class="emoji">❤️</div><div class="msg">新年快樂</div>`;
             document.body.appendChild(div);
             setTimeout(() => div.remove(), 8000);
         }
-        setInterval(createHearts, 600);
+        setInterval(createFloatingHeart, 600);
     </script>
 </body>
 </html>
