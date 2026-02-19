@@ -3,127 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>無縫循環愛心跑馬燈 - 芸萱媽媽專屬</title>
+    <title>真正無限循環愛心 - 芸萱媽媽</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             background-color: #fff0f5;
             overflow: hidden;
-            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+            font-family: "Microsoft JhengHei", sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            width: 100vw;
         }
 
-        .heart-svg-container {
-            width: 95vw;
-            height: 95vh;
+        .container {
+            width: 100vw;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
+            position: relative;
         }
 
-        svg { overflow: visible; }
+        svg {
+            width: 90%;
+            height: 90%;
+            overflow: visible;
+        }
 
-        .path-text {
+        /* 跑馬燈文字樣式 */
+        .marquee-text {
             font-size: 30px;
             font-weight: 900;
             fill: #ff4757;
-            /* 讓文字顏色像彩虹般變換 */
-            animation: rainbowFlow 6s linear infinite;
+            /* 彩虹漸變效果 */
+            animation: rainbow 5s linear infinite;
         }
 
-        @keyframes rainbowFlow {
+        @keyframes rainbow {
             0% { fill: #ff4757; }
-            33% { fill: #2ecc71; }
-            66% { fill: #0abde3; }
+            33% { fill: #ffa502; }
+            66% { fill: #2ed573; }
             100% { fill: #ff4757; }
         }
 
-        /* 漂浮愛心樣式 */
-        .floating-heart {
+        /* 漂浮新年愛心 */
+        .float-heart {
             position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
             pointer-events: none;
+            z-index: 1;
         }
-        .heart-emoji { font-size: 65px; opacity: 0.6; }
-        .heart-msg {
+        .emoji { font-size: 60px; opacity: 0.7; }
+        .msg {
             position: absolute;
             color: white;
             font-size: 14px;
             font-weight: bold;
             top: 40%;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        @keyframes riseUp {
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-20vh) scale(1.2) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="heart-svg-container">
-        <svg viewBox="0 0 800 600" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+    <div class="container">
+        <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
             <defs>
-                <path id="infiniteHeart" d="M400,550 C350,450 50,350 50,180 C50,50 300,50 400,180 C500,50 750,50 750,180 C750,350 450,450 400,550 Z" />
+                <path id="heartPath" d="M400,550 C300,450 20,350 20,180 C20,50 300,50 400,180 C500,50 780,50 780,180 C780,350 500,450 400,550 Z" />
             </defs>
-            
-            <text class="path-text">
-                <textPath xlink:href="#infiniteHeart" startOffset="0%">
-                    ❤️ 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽 ❤️ 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽 ❤️ 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽
-                    <animate attributeName="startOffset" from="0%" to="-100%" dur="25s" repeatCount="indefinite" />
-                </textPath>
+            <text class="marquee-text">
+                <textPath id="tp" xlink:href="#heartPath" startOffset="0"></textPath>
             </text>
         </svg>
     </div>
 
     <script>
-        function createHeart() {
-            const container = document.createElement('div');
-            container.classList.add('floating-heart');
-            
-            // 隨機生成位置
-            container.style.left = Math.random() * 100 + 'vw';
-            container.style.top = '110vh';
-            
-            // 色相隨機旋轉
-            container.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
-            
-            // 隨機動畫速度
-            const duration = Math.random() * 4 + 4;
-            container.style.animation = `rise ${duration}s linear forwards`;
+        const textStr = "❤️ 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽　";
+        const tp = document.getElementById('tp');
+        const path = document.getElementById('heartPath');
+        const pathLength = path.getTotalLength();
 
-            const heart = document.createElement('div');
-            heart.classList.add('heart-emoji');
-            heart.innerHTML = '❤️';
-
-            const msg = document.createElement('div');
-            msg.classList.add('heart-msg');
-            msg.innerHTML = '新年快樂';
-
-            container.appendChild(heart);
-            container.appendChild(msg);
-            document.body.appendChild(container);
-
-            setTimeout(() => container.remove(), duration * 1000);
+        // 核心邏輯：將文字重複填充，直到長度超過路徑的兩倍，確保循環時不會看到斷頭
+        let longText = textStr;
+        while (tp.getComputedTextLength() < pathLength * 2) {
+            longText += textStr;
+            tp.textContent = longText;
         }
 
-        // 注入上升動畫
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `
-            @keyframes rise {
-                0% { transform: translateY(0) scale(0.5); opacity: 0; }
-                20% { opacity: 0.8; }
-                100% { transform: translateY(-120vh) scale(1.5) rotate(360deg); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(styleSheet);
+        // 使用 JS 動畫來控制 startOffset，達成毫秒級精準對接
+        let offset = 0;
+        const singleTextLength = tp.getComputedTextLength() / (longText.length / textStr.length);
 
-        setInterval(createHeart, 600);
+        function animate() {
+            offset -= 1.5; // 控制轉動速度，數字越大越快
+            // 當位移超過一串文字的長度時，瞬間重設為 0，因為內容是一樣的，視覺上完全無感
+            if (Math.abs(offset) >= singleTextLength) {
+                offset = 0;
+            }
+            tp.setAttribute('startOffset', offset);
+            requestAnimationFrame(animate);
+        }
+
+        // 等待字體載入後開始動畫
+        window.onload = animate;
+
+        // 生成新年快樂愛心
+        function createHearts() {
+            const div = document.createElement('div');
+            div.className = 'float-heart';
+            div.style.left = Math.random() * 90 + 'vw';
+            div.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+            div.style.animation = `riseUp ${Math.random() * 3 + 5}s linear forwards`;
+
+            div.innerHTML = `
+                <div class="emoji">❤️</div>
+                <div class="msg">新年快樂</div>
+            `;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 8000);
+        }
+        setInterval(createHearts, 600);
     </script>
 </body>
 </html>
