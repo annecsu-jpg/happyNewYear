@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>致良班美女與芸萱媽媽 - 新年快樂</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fff0f5; /* 夢幻淡粉色 */
+            overflow: hidden;
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* 跑馬燈容器 */
+        .marquee-container {
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.3); /* 半透明背景增加層次感 */
+            padding: 20px 0;
+        }
+
+        /* 跑馬燈文字 */
+        .marquee-text {
+            display: inline-block;
+            font-size: 4rem;
+            font-weight: 900;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+            animation: marquee 12s linear infinite, colorChange 5s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        @keyframes colorChange {
+            0% { color: #ff4757; }
+            25% { color: #ffa502; }
+            50% { color: #2ed573; }
+            75% { color: #1e90ff; }
+            100% { color: #ff4757; }
+        }
+
+        /* 愛心容器 */
+        .heart-container {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            animation: float 7s linear infinite;
+        }
+
+        /* 愛心形狀 (Emoji) */
+        .heart-bg {
+            font-size: 80px; /* 加大愛心 */
+            opacity: 0.8;
+        }
+
+        /* 愛心中的新年快樂文字 */
+        .heart-text {
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            top: 45%; /* 調整文字在愛心中的高度 */
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(110vh) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-20vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee-container">
+        <div class="marquee-text">
+            🧧 良班美女同學 & 超級有氣質活潑可愛大美女芸萱媽媽 🧧
+        </div>
+    </div>
+
+    <script>
+        function createNewYearHeart() {
+            const container = document.createElement('div');
+            container.classList.add('heart-container');
+
+            // 隨機位置
+            container.style.left = Math.random() * 90 + 'vw';
+            
+            // 隨機大小縮放
+            const scale = Math.random() * 0.5 + 0.8;
+            container.style.transform = `scale(${scale})`;
+
+            // 隨機顏色 (濾鏡旋轉)
+            container.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+
+            // 隨機動畫速度
+            const duration = Math.random() * 4 + 4 + 's';
+            container.style.animationDuration = duration;
+
+            // 建立愛心背景
+            const heartBg = document.createElement('div');
+            heartBg.classList.add('heart-bg');
+            heartBg.innerHTML = '❤️';
+
+            // 建立新年快樂文字
+            const heartText = document.createElement('div');
+            heartText.classList.add('heart-text');
+            heartText.innerHTML = '新年快樂';
+
+            container.appendChild(heartBg);
+            container.appendChild(heartText);
+            document.body.appendChild(container);
+
+            // 動畫結束後移除
+            setTimeout(() => {
+                container.remove();
+            }, 8000);
+        }
+
+        // 定時產生帶有文字的愛心
+        setInterval(createNewYearHeart, 500);
+    </script>
+</body>
+</html>
